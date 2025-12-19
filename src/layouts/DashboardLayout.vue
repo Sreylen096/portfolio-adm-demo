@@ -4,8 +4,8 @@
     <Sidebar :isOpen="sidebarOpen" />
 
     <!-- Main Content -->
-    <main class="content" :class="{ expanded: !sidebarOpen }">
-      <slot />
+    <main class="content mt-5" :class="{ expanded: !sidebarOpen }">
+      <router-view></router-view>
     </main>
   </div>
 </template>
