@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import HomeView from "../views/HomeView.vue";
+import DashboardView from "../views/DashboardView.vue";
 import LoginView from "@/views/LoginView.vue";
 import ArticleView from "@/views/ArticleView.vue";
 
@@ -13,8 +13,8 @@ const router = createRouter({
       children: [
         {
           path: "",
-          name: "home",
-          component: HomeView,
+          name: "dashboard",
+          component: DashboardView,
           meta: {
             title: "Dashboard",
           },
@@ -40,6 +40,7 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   document.title = to.meta.title ? to.meta.title + " - My Admin" : "My Admin";
   return true; 
+  
 });
 
 export default router;
