@@ -1,5 +1,5 @@
 <template>
-    <div class="modal" tabindex="-1" :style="{ display: show ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }"
+    <div class="modal fade show" tabindex="-1" :style="{ display: show ? 'block' : 'none', backgroundColor: 'rgba(0,0,0,0.5)' }"
         @click.self="close">
         <div class="modal-dialog modal-dialog-centered" :class="sizeClass">
             <div class="modal-content">

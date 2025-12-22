@@ -59,88 +59,131 @@ const handleLogin = async () => {
             <h3 class="text-center mb-4">Login</h3>
 
             <form @submit.prevent="handleLogin">
-                <!-- Email -->
                 <div class="mb-3">
-                    <BaseInput v-model="email" label="Email" placeholder="Enter your email" type="email"
-                        :error="emailError" />
+                    <BaseInput v-model="state.form.email" label="Email" placeholder="Enter your email" type="email"
+                        :error="state.formErrors.email.message" />
                 </div>
-
-                <!-- Password -->
                 <div class="mb-3">
-                    <BaseInput v-model="password" label="Password" placeholder="Enter your password" type="password"
-                        :error="passwordError" />
-                </div>
+                    <BaseInput v-model="state.form.password" label="Password" placeholder="Enter your password"
+                        type="password" :error="state.formErrors.password.message" />
 
-                <!-- Submit using BaseButton -->
-                <BaseButton type="submit" label="Login" variant="primary" :disabled="isDisabled" block
-                    :loading="loading" />
+                </div>
+                <BaseButton @click="submit" class="w-100">
+                    Login
+                </BaseButton>
+
             </form>
         </div>
     </div>
+    <BaseToast v-model:show="toastVisible" :message="toastMessage" />
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { reactive, computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
 const router = useRouter();
 
-const email = ref("");
-const password = ref("");
 const loading = ref(false);
-const emailError = ref("");
-const passwordError = ref("");
+const toastVisible = ref(false);
+const toastMessage = ref("");
 
+const state = reactive({
+    form: {
+        email: "",
+        password: "",
+    },
+    formErrors: {
+        email: {
+            message: "",
+            isValid: true,
+        },
+        password: {
+            message: "",
+            isValid: true,
+        },
+    },
+});
 
-const isDisabled = computed(() => !email.value || !password.value);
+const isDisabled = computed(() => {
+    return !state.form.email || !state.form.password;
+});
 
-const validate = () => {
-    let valid = true;
+/* ================= VALIDATION ================= */
 
-    // Reset errors
-    emailError.value = "";
-    passwordError.value = "";
+const validateEmail = () => {
+    const email = state.form.email;
+    const error = state.formErrors.email;
 
-    // Email required + basic format
-    if (!email.value) {
-        emailError.value = "Email is required";
-        valid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email.value)) {
-        emailError.value = "Email is invalid";
-        valid = false;
+    error.message = "";
+    error.isValid = true;
+
+    if (!email) {
+        error.message = "Email is required";
+        error.isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+        error.message = "Email is invalid";
+        error.isValid = false;
     }
 
-    // Password required
-    if (!password.value) {
-        passwordError.value = "Password is required";
-        valid = false;
-    } else if (password.value.length < 6) {
-        passwordError.value = "Password must be at least 6 characters";
-        valid = false;
-    }
-
-    return valid;
+    return error.isValid;
 };
 
+const validatePassword = () => {
+    const password = state.form.password;
+    const error = state.formErrors.password;
+
+    error.message = "";
+    error.isValid = true;
+
+    if (!password) {
+        error.message = "Password is required";
+        error.isValid = false;
+    } else if (password.length < 6) {
+        error.message = "Password must be at least 6 characters";
+        error.isValid = false;
+    }
+
+    return error.isValid;
+};
+
+const validateForm = () => {
+    const emailValid = validateEmail();
+    const passwordValid = validatePassword();
+    return emailValid && passwordValid;
+};
+
+/* ================= LOGIN ================= */
 
 const handleLogin = async () => {
-    if (!validate()) return;
+    if (!validateForm()) return;
 
     try {
         loading.value = true;
-        await authStore.login({ email: email.value, password: password.value });
+
+        await authStore.login({
+            email: state.form.email,
+            password: state.form.password,
+        });
+
         await authStore.fetchUser();
+
+        toastMessage.value = "Login successful!";
+        toastVisible.value = true;
+
         router.push({ name: "dashboard" });
     } catch (err) {
-        console.error("Login failed:", err);
+        toastMessage.value = "Login failed!";
+        toastVisible.value = true;
+        console.error(err);
     } finally {
         loading.value = false;
     }
 };
-
 </script>
+
 
 <style scoped>
 .login-layout {

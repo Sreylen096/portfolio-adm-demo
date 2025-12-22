@@ -47,14 +47,11 @@ defineProps({
       <h6 class="text-uppercase text-secondary mb-3">Admin</h6>
 
       <ul class="nav nav-pills flex-column gap-1">
-        <!-- Dashboard -->
         <li class="nav-item">
           <RouterLink class="nav-link active" to="/">
             <i class="bi bi-speedometer me-2"></i>Dashboard
           </RouterLink>
         </li>
-
-        <!-- My Article Collapse -->
         <li class="nav-item">
           <a class="nav-link d-flex justify-content-between align-items-center" href="#articleCollapse"
             data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="articleCollapse">
@@ -73,8 +70,6 @@ defineProps({
             </ul>
           </div>
         </li>
-
-        <!-- Logout -->
         <li class="nav-item mt-3">
           <a class="nav-link text-danger" href="#" @click.prevent="showLogoutModal = true">
             Logout
@@ -82,14 +77,17 @@ defineProps({
         </li>
       </ul>
     </div>
-
-    <!-- Logout Modal -->
-    <BaseModal v-model:show="showLogoutModal" title="Confirm Logout" >
+    <BaseModal v-model:show="showLogoutModal" title="Confirm Logout">
       <p>Are you sure you want to log out?</p>
 
       <template #footer>
-        <BaseButton label="Cancel" variant="secondary" class="me-2" @click="showLogoutModal = false" />
-        <BaseButton label="Logout" variant="danger" @click="handleLogout" />
+        <BaseButton @click="showLogoutModal = false" variant="secondary">
+          Cancel
+        </BaseButton>
+        <BaseButton @click="handleLogout" variant="danger">
+          Login
+        </BaseButton>
+
       </template>
     </BaseModal>
   </aside>
