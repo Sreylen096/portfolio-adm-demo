@@ -61,30 +61,28 @@ const handleLogin = async () => {
             <form @submit.prevent="handleLogin">
                 <!-- Email -->
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" v-model="email" class="form-control py-2"
-                        placeholder="Enter your email" required />
+                    <BaseInput v-model="email" label="Email" placeholder="Enter your email" type="email"
+                        :error="emailError" />
                 </div>
 
                 <!-- Password -->
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" v-model="password" class="form-control py-2"
-                        placeholder="Enter your password" required />
+                    <BaseInput v-model="password" label="Password" placeholder="Enter your password" type="password"
+                        :error="passwordError" />
                 </div>
 
                 <!-- Submit using BaseButton -->
-                <BaseButton type="submit" label="Login" variant="primary" block :loading="loading" />
+                <BaseButton type="submit" label="Login" variant="primary" :disabled="isDisabled" block
+                    :loading="loading" />
             </form>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import BaseButton from "@/components/ui/base/BaseButton.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -92,8 +90,44 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 const loading = ref(false);
+const emailError = ref("");
+const passwordError = ref("");
+
+
+const isDisabled = computed(() => !email.value || !password.value);
+
+const validate = () => {
+    let valid = true;
+
+    // Reset errors
+    emailError.value = "";
+    passwordError.value = "";
+
+    // Email required + basic format
+    if (!email.value) {
+        emailError.value = "Email is required";
+        valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email.value)) {
+        emailError.value = "Email is invalid";
+        valid = false;
+    }
+
+    // Password required
+    if (!password.value) {
+        passwordError.value = "Password is required";
+        valid = false;
+    } else if (password.value.length < 6) {
+        passwordError.value = "Password must be at least 6 characters";
+        valid = false;
+    }
+
+    return valid;
+};
+
 
 const handleLogin = async () => {
+    if (!validate()) return;
+
     try {
         loading.value = true;
         await authStore.login({ email: email.value, password: password.value });
@@ -105,6 +139,7 @@ const handleLogin = async () => {
         loading.value = false;
     }
 };
+
 </script>
 
 <style scoped>
