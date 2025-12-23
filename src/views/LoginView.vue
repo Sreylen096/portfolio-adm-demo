@@ -60,17 +60,17 @@ const handleLogin = async () => {
 
             <form @submit.prevent="handleLogin">
                 <div class="mb-3">
-                    <BaseInput v-model="state.form.email" label="Email" placeholder="Enter your email" type="email"
-                        :error="state.formErrors.email.message" />
+                    <BaseInput v-model="state.form.email" @input="validateEmail" label="Email"
+                        placeholder="Enter your email" type="email" :error="state.formErrors.email.message" />
                 </div>
                 <div class="mb-3">
-                    <BaseInput v-model="state.form.password" label="Password" placeholder="Enter your password"
-                        type="password" :error="state.formErrors.password.message" />
-
+                    <BaseInput v-model="state.form.password" @input="validatePassword" label="Password"
+                        placeholder="Enter your password" type="password" :error="state.formErrors.password.message" />
                 </div>
-                <BaseButton @click="submit" class="w-100">
+                <BaseButton class="w-100" :isLoading="loading" :isDisabled="isDisabled" type="submit">
                     Login
                 </BaseButton>
+
 
             </form>
         </div>
