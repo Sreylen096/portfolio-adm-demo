@@ -74,9 +74,9 @@ router.beforeEach(async (to) => {
     return { name: "login" };
   }
 
-  if (hasToken && to.name === "login") {
-    return { name: "dashboard" };
-  }
+  // if (hasToken && to.name === "login") {
+  //   return { name: "dashboard" };
+  // }
 
   return true;
 });

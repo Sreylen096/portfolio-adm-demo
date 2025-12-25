@@ -60,8 +60,11 @@ const handleLogin = async () => {
 
             <form @submit.prevent="handleLogin">
                 <div class="mb-3">
-                    <BaseInput v-model="state.form.email" @input="validateEmail" label="Email"
-                        placeholder="Enter your email" type="email" :error="state.formErrors.email.message" />
+                    <!-- <BaseInput v-model="state.form.email" @input="validateEmail" label="Email"
+                        placeholder="Enter your email" type="email" :error="state.formErrors.email.message" /> -->
+
+                    <BaseInput v-model="state.form.email" @input="validateField('email', state.form.email, 'Email is required.')" label="Email"
+                        placeholder="Enter your email" type="email" :error="errors.email" />
                 </div>
                 <div class="mb-3">
                     <BaseInput v-model="state.form.password" @input="validatePassword" label="Password"
@@ -82,6 +85,7 @@ const handleLogin = async () => {
 import { reactive, computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { useRequiredValidator } from "@/composables/useRequiredValidator";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -89,6 +93,8 @@ const router = useRouter();
 const loading = ref(false);
 const toastVisible = ref(false);
 const toastMessage = ref("");
+
+const { errors, validateField } = useRequiredValidator();
 
 const state = reactive({
     form: {
@@ -107,29 +113,32 @@ const state = reactive({
     },
 });
 
+
+
 const isDisabled = computed(() => {
     return !state.form.email || !state.form.password;
 });
 
 /* ================= VALIDATION ================= */
 
-const validateEmail = () => {
-    const email = state.form.email;
-    const error = state.formErrors.email;
+const validateEmail = () => validateField("email", state.form.email, "Email is required.")
+// const validateEmail = () => {
+//     const email = state.form.email;
+//     const error = state.formErrors.email;
 
-    error.message = "";
-    error.isValid = true;
+//     error.message = "";
+//     error.isValid = true;
 
-    if (!email) {
-        error.message = "Email is required";
-        error.isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-        error.message = "Email is invalid";
-        error.isValid = false;
-    }
+//     if (!email) {
+//         error.message = "Email is required";
+//         error.isValid = false;
+//     } else if (!/\S+@\S+\.\S+/.test(email)) {
+//         error.message = "Email is invalid";
+//         error.isValid = false;
+//     }
 
-    return error.isValid;
-};
+//     return error.isValid;
+// };
 
 const validatePassword = () => {
     const password = state.form.password;
@@ -150,8 +159,8 @@ const validatePassword = () => {
 };
 
 const validateForm = () => {
-    const emailValid = validateEmail();
-    const passwordValid = validatePassword();
+    const emailValid = validateEmail()
+    const passwordValid = validateField("password", state.form.password, "Password is required.");
     return emailValid && passwordValid;
 };
 
