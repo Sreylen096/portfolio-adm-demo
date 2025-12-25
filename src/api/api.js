@@ -10,7 +10,7 @@ const api = axios.create({
   },
 });
 
-// Automatically attach token
+
 api.interceptors.request.use((config) => {
   const authStore = useAuthStore();
 

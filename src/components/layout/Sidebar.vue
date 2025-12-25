@@ -42,7 +42,7 @@
           Cancel
         </BaseButton>
         <BaseButton @click="handleLogout" variant="danger">
-          Login
+          Login Out
         </BaseButton>
 
       </template>

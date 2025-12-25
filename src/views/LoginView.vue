@@ -117,8 +117,6 @@ const validateEmail = () => {
     const email = state.form.email;
     const error = state.formErrors.email;
 
-    error.message = "";
-    error.isValid = true;
 
     if (!email) {
         error.message = "Email is required";
@@ -126,6 +124,9 @@ const validateEmail = () => {
     } else if (!/\S+@\S+\.\S+/.test(email)) {
         error.message = "Email is invalid";
         error.isValid = false;
+    } else {
+        error.message = "";
+        error.isValid = true;
     }
 
     return error.isValid;
@@ -152,7 +153,7 @@ const validatePassword = () => {
 const validateForm = () => {
     const emailValid = validateEmail();
     const passwordValid = validatePassword();
-    return emailValid && passwordValid;
+    return validateEmail && validatePassword;
 };
 
 /* ================= LOGIN ================= */
