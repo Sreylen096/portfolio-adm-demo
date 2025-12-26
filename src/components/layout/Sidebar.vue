@@ -28,23 +28,17 @@
           </div>
         </li>
         <li class="nav-item mt-3">
-          <a class="nav-link text-danger" href="#" @click.prevent="showLogoutModal = true">
+          <a class="nav-link text-danger" href="#" @click="showModal = true">
             Logout
           </a>
         </li>
       </ul>
     </div>
-    <BaseModal v-model:show="showLogoutModal" title="Confirm Logout">
+    <BaseModal v-if="showModal" title="Confirm Logout">
       <p>Are you sure you want to log out?</p>
-
       <template #footer>
-        <BaseButton @click="showLogoutModal = false" variant="secondary">
-          Cancel
-        </BaseButton>
-        <BaseButton @click="handleLogout" variant="danger">
-          Login Out
-        </BaseButton>
-
+        <BaseButton @click="showModal = false" variant="secondary">Cancel</BaseButton>
+        <BaseButton @click="handleLogout" variant="danger">{{ isLoading ? "Logging out..." : "Log Out" }}</BaseButton>
       </template>
     </BaseModal>
   </aside>
@@ -57,18 +51,21 @@ import { useRouter } from "vue-router";
 
 const isOpen = defineProps({ isOpen: Boolean });
 
-const showLogoutModal = ref(false);
+const showModal = ref(false);
 const authStore = useAuthStore();
 const router = useRouter();
+const isLoading = ref(false);
 
 const handleLogout = async () => {
   try {
+    isLoading.value = true;
     await authStore.logout();
     router.push({ name: "login" });
   } catch (err) {
     console.error("Logout failed:", err);
   } finally {
-    showLogoutModal.value = false;
+    showModal.value = false; 
+    isLoading.value = false;
   }
 };
 </script>

@@ -61,14 +61,14 @@ router.beforeEach(async (to) => {
 
   document.title = to.meta.title ? `${to.meta.title} - My Admin` : "My Admin";
 
-  // if (hasToken && !authStore.user) {
-  //   try {
-  //     await authStore.fetchUser();
-  //   } catch (e) {
-  //     authStore.logout();
-  //     return { name: "login" };
-  //   }
-  // }
+  if (hasToken && !authStore.user) {
+    try {
+      await authStore.fetchUser();
+    } catch (e) {
+      authStore.logout();
+      return { name: "login" };
+    }
+  }
 
   if (!hasToken && to.name !== "login") {
     return { name: "login" };

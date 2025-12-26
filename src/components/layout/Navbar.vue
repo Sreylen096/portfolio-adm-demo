@@ -10,11 +10,15 @@
       <img
         src="https://thumbs.dreamstime.com/b/d-icon-avatar-cartoon-cute-freelancer-woman-working-online-learning-laptop-transparent-png-background-works-embodying-345422695.jpg"
         class="rounded-circle me-2 img-fluid" alt="avatar" width="40" height="40" />
-      <span class="text-white">Admin</span>
+      <span class="text-white">{{ authStore.user?.firstName}} {{ authStore.user?.lastName }}</span>
     </div>
   </nav>
 </template>
 
 <script setup>
 defineEmits(['toggleSidebar']);
+
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 </script>

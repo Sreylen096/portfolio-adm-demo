@@ -1,171 +1,72 @@
-<!-- <template>
-    <div class="login-layout d-flex justify-content-center align-items-center vh-100 bg-light">
-        <div class="card p-4 " style="width: 400px;">
-            <h3 class="text-center mb-4">Login</h3>
-            <form @submit.prevent="handleLogin">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" v-model="email" class="form-control py-2"
-                        placeholder="Enter your email" required />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" v-model="password" class="form-control py-2"
-                        placeholder="Enter your password" required />
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
-        </div>
-    </div>
-</template>
-
-<script setup>
-import { ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
-
-const authStore = useAuthStore();
-const router = useRouter();
-
-const email = ref("");
-const password = ref("");
-
-const handleLogin = async () => {
-    await authStore.login({
-        email: email.value,
-        password: password.value,
-    });
-
-    await authStore.fetchUser();
-    router.push({ name: "dashboard" });
-};
-</script>
-
-
-<style scoped>
-.login-layout {
-    background: #f8f9fa;
-}
-
-.card {
-    border-radius: 0.5rem;
-}
-</style> -->
-
-
 <template>
     <div class="login-layout d-flex justify-content-center align-items-center vh-100 bg-light">
         <div class="card p-4" style="width: 400px;">
             <h3 class="text-center mb-4">Login</h3>
 
             <form @submit.prevent="handleLogin">
+                <!-- Email -->
                 <div class="mb-3">
-                    <!-- <BaseInput v-model="state.form.email" @input="validateEmail" label="Email"
-                        placeholder="Enter your email" type="email" :error="state.formErrors.email.message" /> -->
-
-                    <BaseInput v-model="state.form.email" @input="validateField('email', state.form.email, 'Email is required.')" label="Email"
+                    <BaseInput v-model="state.form.email"
+                        @input="validateField('email', state.form.email, 'Email is required.')" label="Email"
                         placeholder="Enter your email" type="email" :error="errors.email" />
                 </div>
+
+                <!-- Password -->
                 <div class="mb-3">
-                    <BaseInput v-model="state.form.password" @input="validatePassword" label="Password"
-                        placeholder="Enter your password" type="password" :error="state.formErrors.password.message" />
+                    <BaseInput v-model="state.form.password"
+                        @input="validateField('password', state.form.password, 'Password is required.', { min: 6 })"
+                        label="Password" placeholder="Enter your password" type="password" :error="errors.password" />
                 </div>
+
+                <!-- Submit -->
                 <BaseButton class="w-100" :isLoading="loading" :isDisabled="isDisabled" type="submit">
-                    Login
+                   {{ loading ? "Logging in..." : "Login" }}
                 </BaseButton>
-
-
             </form>
         </div>
+
+        <!-- Toast -->
+        <BaseToast v-model:show="toastVisible" :message="toastMessage" />
     </div>
-    <BaseToast v-model:show="toastVisible" :message="toastMessage" />
 </template>
 
 <script setup>
-import { reactive, computed, ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
+import { reactive, ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 import { useRequiredValidator } from "@/composables/useRequiredValidator";
 
+// Auth & Router
 const authStore = useAuthStore();
 const router = useRouter();
 
+// Loading & Toast
 const loading = ref(false);
 const toastVisible = ref(false);
 const toastMessage = ref("");
 
+// Validation
 const { errors, validateField } = useRequiredValidator();
 
+// Form state
 const state = reactive({
     form: {
         email: "",
         password: "",
     },
-    formErrors: {
-        email: {
-            message: "",
-            isValid: true,
-        },
-        password: {
-            message: "",
-            isValid: true,
-        },
-    },
 });
 
+// Disable login button if fields are empty
+const isDisabled = computed(() => !state.form.email || !state.form.password);
 
-
-const isDisabled = computed(() => {
-    return !state.form.email || !state.form.password;
-});
-
-/* ================= VALIDATION ================= */
-
-const validateEmail = () => validateField("email", state.form.email, "Email is required.")
-// const validateEmail = () => {
-//     const email = state.form.email;
-//     const error = state.formErrors.email;
-
-//     error.message = "";
-//     error.isValid = true;
-
-//     if (!email) {
-//         error.message = "Email is required";
-//         error.isValid = false;
-//     } else if (!/\S+@\S+\.\S+/.test(email)) {
-//         error.message = "Email is invalid";
-//         error.isValid = false;
-//     }
-
-//     return error.isValid;
-// };
-
-const validatePassword = () => {
-    const password = state.form.password;
-    const error = state.formErrors.password;
-
-    error.message = "";
-    error.isValid = true;
-
-    if (!password) {
-        error.message = "Password is required";
-        error.isValid = false;
-    } else if (password.length < 6) {
-        error.message = "Password must be at least 6 characters";
-        error.isValid = false;
-    }
-
-    return error.isValid;
-};
-
+// Validate entire form
 const validateForm = () => {
-    const emailValid = validateEmail()
-    const passwordValid = validateField("password", state.form.password, "Password is required.");
+    const emailValid = validateField("email", state.form.email, "Email is required.");
+    const passwordValid = validateField("password", state.form.password, "Password is required.", { min: 6 });
     return emailValid && passwordValid;
 };
 
-/* ================= LOGIN ================= */
-
+// Handle login
 const handleLogin = async () => {
     if (!validateForm()) return;
 
@@ -192,6 +93,7 @@ const handleLogin = async () => {
     }
 };
 </script>
+
 
 
 <style scoped>
