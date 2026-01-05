@@ -1,21 +1,31 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import api from "@/api/api";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref(null);
+
   const token = ref(localStorage.getItem("token"));
+  const user = ref(null);
+
+  const isAuthenticated = computed(() => !!token.value && !!user.value);
 
   const login = async (payload) => {
     const res = await api.post("/auth/login", payload);
 
     token.value = res.data.data.token;
     localStorage.setItem("token", token.value);
+
+    await fetchProfile();
   };
 
-  const fetchUser = async () => {
-    const res = await api.get("/auth/profile");
-    user.value = res.data.data;
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/auth/profile");
+      user.value = res.data.data;
+    } catch (error) {
+      clearAuth();
+      throw error;
+    }
   };
 
   const logout = async () => {
@@ -33,10 +43,13 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   return {
-    user,
     token,
+    user,
+    isAuthenticated,
+
     login,
-    fetchUser,
+    fetchProfile,
     logout,
+    clearAuth,
   };
 });

@@ -10,7 +10,6 @@ const api = axios.create({
   },
 });
 
-
 api.interceptors.request.use((config) => {
   const authStore = useAuthStore();
 

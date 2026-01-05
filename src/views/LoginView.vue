@@ -1,107 +1,74 @@
 <template>
-    <div class="login-layout d-flex justify-content-center align-items-center vh-100 bg-light">
-        <div class="card p-4" style="width: 400px;">
-            <h3 class="text-center mb-4">Login</h3>
+    <div class="container vh-100 d-flex justify-content-center align-items-center">
+        <div class="card p-4" style="width: 500px">
+            <h2 class="mb-4 text-center fw-bolder">Login</h2>
 
-            <form @submit.prevent="handleLogin">
-                <!-- Email -->
-                <div class="mb-3">
-                    <BaseInput v-model="state.form.email"
-                        @input="validateField('email', state.form.email, 'Email is required.')" label="Email"
-                        placeholder="Enter your email" type="email" :error="errors.email" />
+            <form @submit.prevent="onHandleLogin">
+                <BaseInput v-model="state.form.email" label="Email" type="text" placeholder="Enter your email"
+                    :error="errors.email" @blur="validateEmail" />
+                <div class="mt-3">
+                    <BaseInput v-model="state.form.password" label="Password" type="password"
+                        placeholder="Enter your password" :error="errors.password" @blur="validatePass" />
                 </div>
 
-                <!-- Password -->
-                <div class="mb-3">
-                    <BaseInput v-model="state.form.password"
-                        @input="validateField('password', state.form.password, 'Password is required.', { min: 6 })"
-                        label="Password" placeholder="Enter your password" type="password" :error="errors.password" />
-                </div>
-
-                <!-- Submit -->
-                <BaseButton class="w-100" :isLoading="loading" :isDisabled="isDisabled" type="submit">
-                   {{ loading ? "Logging in..." : "Login" }}
+                <BaseButton :disabled="state.isLoading" type="submit" class="w-100 mt-3" :isLoading="state.isLoading">
+                    Login
                 </BaseButton>
             </form>
         </div>
-
-        <!-- Toast -->
-        <BaseToast v-model:show="toastVisible" :message="toastMessage" />
     </div>
 </template>
 
 <script setup>
-import { reactive, ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+import { reactive } from "vue";
 import { useRequiredValidator } from "@/composables/useRequiredValidator";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
 
-// Auth & Router
 const authStore = useAuthStore();
 const router = useRouter();
 
-// Loading & Toast
-const loading = ref(false);
-const toastVisible = ref(false);
-const toastMessage = ref("");
-
-// Validation
-const { errors, validateField } = useRequiredValidator();
-
-// Form state
 const state = reactive({
     form: {
         email: "",
         password: "",
     },
+    isLoading: false,
 });
 
-// Disable login button if fields are empty
-const isDisabled = computed(() => !state.form.email || !state.form.password);
+const { errors, validateField } = useRequiredValidator();
 
-// Validate entire form
+const validateEmail = () =>
+    validateField("email", state.form.email, "Email is required");
+
+const validatePass = () =>
+    validateField("password", state.form.password, "Password cannot be empty");
+
 const validateForm = () => {
-    const emailValid = validateField("email", state.form.email, "Email is required.");
-    const passwordValid = validateField("password", state.form.password, "Password is required.", { min: 6 });
-    return emailValid && passwordValid;
+    let isValid = true;
+
+    const vEmail = validateEmail();
+    const vPassword = validatePass();
+
+    if (!vEmail || !vPassword) isValid = false;
+
+    return isValid;
 };
 
-// Handle login
-const handleLogin = async () => {
+const onHandleLogin = async () => {
     if (!validateForm()) return;
 
     try {
-        loading.value = true;
-
+        state.isLoading = true;
         await authStore.login({
             email: state.form.email,
             password: state.form.password,
         });
-
-        await authStore.fetchUser();
-
-        toastMessage.value = "Login successful!";
-        toastVisible.value = true;
-
         router.push({ name: "dashboard" });
     } catch (err) {
-        toastMessage.value = "Login failed!";
-        toastVisible.value = true;
         console.error(err);
     } finally {
-        loading.value = false;
+        state.isLoading = false;
     }
 };
 </script>
-
-
-
-<style scoped>
-.login-layout {
-    background: #f8f9fa;
-}
-
-.card {
-    border-radius: 0.5rem;
-}
-</style>

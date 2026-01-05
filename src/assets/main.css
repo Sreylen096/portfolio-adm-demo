@@ -1,0 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap");
+
+body {
+  font-family: "Kantumruy Pro", sans-serif !important;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  line-clamp: 1;
+}
+
+
+.btn-primary{
+  background-color: #212529!important;
+  color: #ffffff!important;
+  border: none!important;
+}
+
+.btn-primary:hover{
+  background-color: #3e4348!important;
+  transition: all 0.3s ease!important;
+}
+
